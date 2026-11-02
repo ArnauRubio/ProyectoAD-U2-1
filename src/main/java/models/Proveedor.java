@@ -31,13 +31,19 @@ public class Proveedor {
     public Proveedor() {
     }
 
-    public Proveedor(Integer id, String codigo, String nombre, String apellidos, String direccion, List<Gestion> gestiones) {
-        this.id = id;
+    public Proveedor(String codigo, String nombre, String apellidos, String direccion, List<Gestion> gestiones) {
         this.codigo = codigo;
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.direccion = direccion;
         this.gestiones = gestiones;
+    }
+
+    public Proveedor(String codigo, String nombre, String apellidos, String direccion) {
+        this.codigo = codigo;
+        this.nombre = nombre;
+        this.apellidos = apellidos;
+        this.direccion = direccion;
     }
 
     public Integer getId() {

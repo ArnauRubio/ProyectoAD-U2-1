@@ -24,11 +24,11 @@ public class Gestion {
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "proveedor_id", referencedColumnName = "id")
-    private Proyecto proveedor;
+    private Proveedor proveedor;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "pieza_id", referencedColumnName = "id")
-    private Proyecto pieza;
+    private Pieza pieza;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "proyecto_id", referencedColumnName = "id")
@@ -37,7 +37,7 @@ public class Gestion {
     public Gestion() {
     }
 
-    public Gestion(Integer id, String codigo, LocalDate fecha, Integer cantidad, Proyecto proveedor, Proyecto pieza, Proyecto proyecto) {
+    public Gestion(Integer id, String codigo, LocalDate fecha, Integer cantidad, Proveedor proveedor, Pieza pieza, Proyecto proyecto) {
         this.id = id;
         this.codigo = codigo;
         this.fecha = fecha;
@@ -79,19 +79,19 @@ public class Gestion {
         this.cantidad = cantidad;
     }
 
-    public Proyecto getProveedor() {
+    public Proveedor getProveedor() {
         return proveedor;
     }
 
-    public void setProveedor(Proyecto proveedor) {
+    public void setProveedor(Proveedor proveedor) {
         this.proveedor = proveedor;
     }
 
-    public Proyecto getPieza() {
+    public Pieza getPieza() {
         return pieza;
     }
 
-    public void setPieza(Proyecto pieza) {
+    public void setPieza(Pieza pieza) {
         this.pieza = pieza;
     }
 

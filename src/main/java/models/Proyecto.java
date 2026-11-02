@@ -29,6 +29,12 @@ public class Proyecto {
     public Proyecto() {
     }
 
+    public Proyecto(String codigo, String nombre, String ciudad) {
+        this.codigo = codigo;
+        this.nombre = nombre;
+        this.ciudad = ciudad;
+    }
+
     public Proyecto(Integer id, String codigo, String nombre, String ciudad, List<Gestion> gestiones) {
         this.id = id;
         this.codigo = codigo;

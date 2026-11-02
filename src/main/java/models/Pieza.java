@@ -20,7 +20,7 @@ public class Pieza {
     private String nombre;
 
     @NotNull
-    private String precio;
+    private Double precio;
 
     @NotNull
     private String descripcion;
@@ -31,13 +31,20 @@ public class Pieza {
     public Pieza() {
     }
 
-    public Pieza(Integer id, String codigo, String nombre, String precio, String descripcion, List<Gestion> gestiones) {
+    public Pieza(Integer id, String codigo, String nombre, double precio, String descripcion, List<Gestion> gestiones) {
         this.id = id;
         this.codigo = codigo;
         this.nombre = nombre;
         this.precio = precio;
         this.descripcion = descripcion;
         this.gestiones = gestiones;
+    }
+
+    public Pieza(String codigo, String nombre, double precio, String descripcion) {
+        this.codigo = codigo;
+        this.nombre = nombre;
+        this.precio = precio;
+        this.descripcion = descripcion;
     }
 
     public Integer getId() {
@@ -64,11 +71,11 @@ public class Pieza {
         this.nombre = nombre;
     }
 
-    public String getPrecio() {
+    public double getPrecio() {
         return precio;
     }
 
-    public void setPrecio(String precio) {
+    public void setPrecio(double precio) {
         this.precio = precio;
     }
 
