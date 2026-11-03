@@ -34,6 +34,16 @@ public class App {
                 case 1:
                     menuPiezas();
                     break;
+                case 2:
+                    menuProveedores();
+                    break;
+                case 3:
+                    menuProyectos();
+                    break;
+                case 4:
+                    break;
+                default:
+                    System.out.println("Introduce un numero entero entre 1 y 4");
             }
         } while (opcion != 4);
     }
@@ -74,6 +84,7 @@ public class App {
                     break;
                 case 2:
                     System.out.println("Elije que pieza editar:");
+
                     break;
                 case 3:
                     System.out.println("Elije que pieza borrar:");
