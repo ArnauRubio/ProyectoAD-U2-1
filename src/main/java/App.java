@@ -6,91 +6,92 @@ import models.Proyecto;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class App {
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+    static List<Proveedor> proveedores = new ArrayList<>();
+    static List<Pieza> piezas = new ArrayList<>();
+    static List<Proyecto> proyectos = new ArrayList<>();
+    static List<Gestion> gestiones = new ArrayList<>();
+
+    //static ProveedorDao proveedorDao = new ProveedorDao();
+
+
     public static void main(String[] args) throws IOException {
-
-        mostrarMenuPrincipal();
-
-
-    }
-
-    public static void mostrarMenuPrincipal() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int opcion = 0;
+        int opcion = -1;
         do {
             System.out.print("=========\n" +
                     "\tMENÚ\n" +
                     "=========\n" +
-                    "\t1) Piezas\n" +
-                    "\t2) Proveedores\n" +
+                    "\t1) Proveedores\n" +
+                    "\t2) Piezas\n" +
                     "\t3) Proyectos\n" +
                     "\t4) Salir\n" +
                     "--> Opción: "
             );
-            opcion = Integer.parseInt(br.readLine());
+            try {
+                opcion = Integer.parseInt(br.readLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Valor no válido");
+                return;
+            } catch (IOException e) {
+                System.out.println("Error");
+            }
 
             switch (opcion) {
                 case 1:
-                    menuPiezas();
+                    menuProveedores();
                     break;
                 case 2:
-                    menuProveedores();
+                    menuPiezas();
                     break;
                 case 3:
                     menuProyectos();
                     break;
-                case 4:
-                    break;
                 default:
-                    System.out.println("Introduce un numero entero entre 1 y 4");
+                    System.out.println("Selecciona una opción válida");
             }
         } while (opcion != 4);
     }
 
+    // PIEZAS
     public static void menuPiezas() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        Gestion gestion = new Gestion();
-        int opcion = 0;
+        int opcion = -1;
         do {
-            System.out.print("=========\n" +
-                    "\tGestion de piezas\n" +
-                    "=========\n" +
-                    "\t1) Crear Pieza\n" +
-                    "\t2) Editar Pieza\n" +
-                    "\t3) Borrar Pieza\n" +
-                    "\t4) Listado de Piezas\n" +
-                    "\t5) Busqueda por Nombre de Pieza\n" +
-                    "\t6) Busqueda por id de Pieza\n" +
+            System.out.println("------");
+            System.out.print("=== Menú piezas ===" +
+                    "\t1) Crear pieza\n" +
+                    "\t2) Editar pieza\n" +
+                    "\t3) Borrar pieza\n" +
+                    "\t4) Listado de piezas\n" +
+                    "\t5) Búsqueda por nombre de pieza\n" +
+                    "\t6) Búsqueda por id de pieza\n" +
                     "\t7) Volver\n" +
                     "--> Opción: "
-
             );
-            opcion = Integer.parseInt(br.readLine());
+            try {
+                opcion = Integer.parseInt(br.readLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Valor no válido");
+            } catch (IOException e) {
+                System.out.println("Error");
+            }
 
             switch (opcion) {
                 case 1:
-                    System.out.println("¿Cual es su codigo?:");
-                    String codigo = br.readLine();
-                    System.out.println("¿Cual es su nombre?:");
-                    String nombre = br.readLine();
-                    System.out.println("¿Cual es su precio?:");
-                    double precio = Double.parseDouble(br.readLine());
-                    System.out.println("¿Cual es su descripcion?:");
-                    String descripcion = br.readLine();
-
-                    Pieza pieza = new Pieza(codigo, nombre, precio, descripcion);
-                    gestion.setPieza(pieza);
+                    crearPieza();
                     break;
                 case 2:
-                    System.out.println("Elije que pieza editar:");
-
+                    editarPieza();
                     break;
                 case 3:
-                    System.out.println("Elije que pieza borrar:");
+                    borrarPieza();
                     break;
                 case 4:
-                    System.out.println("Aqui estan todas las piezas:");
+                    mostrarLista(piezas);
                     break;
                 case 5:
                     System.out.println("Introduce el nombre de la pieza a buscar:");
@@ -108,130 +109,153 @@ public class App {
         } while (opcion != 7);
     }
 
-    public static void menuProveedores() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        Gestion gestion = new Gestion();
-        int opcion = 0;
+    public static void crearPieza() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Crear pieza ---");
 
-        do {
-            System.out.print("=========\n" +
-                    "\tGestion de Proveedores\n" +
-                    "=========\n" +
-                    "\t1) Crear Proveedor\n" +
-                    "\t2) Editar Proveedor\n" +
-                    "\t3) Borrar Proveedor\n" +
-                    "\t4) Listado de Proveedores\n" +
-                    "\t5) Busqueda por Nombre de Proveedor\n" +
-                    "\t6) Busqueda por id de Proveedor\n" +
-                    "\t7) Busqueda por Direccion de Proveedor\n" +
-                    "\t8) Volver\n" +
-                    "--> Opción: "
-            );
+        System.out.print("Código: ");
+        String codigo = br.readLine();
+        System.out.print("Nombre: ");
+        String nombre = br.readLine();
+
+        Double precio = 0.0;
+        try {
+            System.out.print("Precio: ");
+            precio = Double.valueOf(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+        System.out.print("Descripción: ");
+        String descripcion = br.readLine();
+
+        Pieza pieza = new Pieza(codigo, nombre, precio, descripcion);
+        piezas.add(pieza);
+        //piezaDao.create(pieza);
+    }
+
+    public static void editarPieza() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Editar pieza ---");
+
+        // Se muestra lista de piezas y eligen una
+        mostrarLista(piezas);
+
+        System.out.print("--> Editar: ");
+        int opcion = -1;
+        try {
             opcion = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
 
-            switch (opcion) {
-                case 1:
-                    System.out.println("¿Cual es el codigo de tu proveedor?:");
-                    String codigo = br.readLine();
-                    System.out.println("¿Cual es su nombre?:");
-                    String nombre = br.readLine();
-                    System.out.println("¿Cual es su apellido?:");
-                    String apellido = br.readLine();
-                    System.out.println("¿Cual es su direccion?:");
-                    String direccion = br.readLine();
+        if (opcion < 0 || opcion >= piezas.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
 
-                    Proveedor prov = new Proveedor(codigo, nombre, apellido, direccion);
-                    gestion.setProveedor(prov);
-                    break;
-                case 2:
-                    System.out.println("Elije que proveedor editar:");
-                    break;
-                case 3:
-                    System.out.println("Elije que proveedor borrar:");
-                    break;
-                case 4:
-                    System.out.println("Aqui estan todos los proveedor:");
-                    break;
-                case 5:
-                    System.out.println("Introduce el nombre del proveedor a buscar:");
-                    String nomProvBuscar = br.readLine();
-                    break;
-                case 6:
-                    System.out.println("Introduce el id del proveedor a buscar:");
-                    int idProvBuscar = Integer.parseInt(br.readLine());
-                    break;
-                case 7:
-                    System.out.println("Introduce la direccion del proveedor a buscar:");
-                    int direccionProvBuscar = Integer.parseInt(br.readLine());
-                    break;
-                case 8:
-                    break;
-                default:
-                    System.out.println("Error: Introduce un numero entero del 1 al 7");
+        // Nuevos valores
+//        System.out.print("Código: ");
+//        String codigo = br.readLine();
+        System.out.print("Nombre: ");
+        String nombre = br.readLine();
 
+        Double precio = 0.0;
+        try {
+            System.out.print("Precio: ");
+            precio = Double.valueOf(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+        System.out.print("Descripción: ");
+        String descripcion = br.readLine();
+
+        if (precio < 0) {
+            System.out.println("Precio no válido");
+            return;
+        }
+        // Sobreescribir
+        Pieza pieza = piezas.get(opcion);
+
+        pieza.setNombre(nombre);
+        pieza.setPrecio(precio);
+        pieza.setDescripcion(descripcion);
+        //piezaDao.update(pieza);
+    }
+
+    public static void borrarPieza() {
+        System.out.println("------");
+        System.out.println("--- Eliminar pieza ---");
+
+        // Se muestra lista de jugadores y eligen uno
+        mostrarLista(piezas);
+        System.out.print("--> Opción: ");
+
+        int opcion = -1;
+        try {
+            opcion = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcion < 0 || opcion >= piezas.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        Pieza aEliminar = piezas.get(opcion);
+        // Una pieza está en varias gestiones
+        for (Gestion gestion : aEliminar.getGestiones()) {
+            // Para cada una de esas gestiones
+            // Quitamos de la lista de gestiones de su proveedor
+            gestion.getProveedor().getGestiones().remove(gestion);
+            // Quitamos de la lista de gestiones de su proyecto
+            gestion.getProyecto().getGestiones().remove(gestion);
+            // Quitamos de la lista de gestiones de su pieza
+            aEliminar.getGestiones().remove(gestion);
+            gestiones.remove(gestion);
+        }
+        piezas.remove(aEliminar);
+    }
+
+    public static void buscarPiezaPorNombre() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Buscar pieza por nombre ---");
+
+        System.out.print("Nombre: ");
+        String nombre = br.readLine();
+
+        for (Pieza pieza : piezas) {
+            if (pieza.getNombre().equalsIgnoreCase(nombre)) {
             }
-        } while (opcion != 8);
+        }
+    }
+
+    public static void menuProveedores() throws IOException {
+
     }
 
     public static void menuProyectos() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        Gestion gestion = new Gestion();
-        int opcion = 0;
 
-        do {
-            System.out.print("=========\n" +
-                    "\tGestion de Proyectos\n" +
-                    "=========\n" +
-                    "\t1) Crear Proyecto\n" +
-                    "\t2) Editar Proyecto\n" +
-                    "\t3) Borrar Proyecto\n" +
-                    "\t4) Listado de Proyectos\n" +
-                    "\t5) Busqueda por Nombre de Proyectos\n" +
-                    "\t6) Busqueda por id de Proyectos\n" +
-                    "\t7) Busqueda por Ciudad de Proyectos\n" +
-                    "\t8) Volver\n" +
-                    "--> Opción: "
-            );
-            opcion = Integer.parseInt(br.readLine());
+    }
 
-            switch (opcion) {
-                case 1:
-                    System.out.println("¿Cual es el codigo de tu proyecto?:");
-                    String codigo = br.readLine();
-                    System.out.println("¿Cual es su nombre?:");
-                    String nombre = br.readLine();
-                    System.out.println("¿Cual es su ciudad?:");
-                    String ciudad = br.readLine();
 
-                    Proyecto proy = new Proyecto(codigo, nombre, ciudad);
-                    gestion.setProyecto(proy);
-                    break;
-                case 2:
-                    System.out.println("Elije que proyecto editar:");
-                    break;
-                case 3:
-                    System.out.println("Elije que proyecto borrar:");
-                    break;
-                case 4:
-                    System.out.println("Aqui estan todos los proyecto:");
-                    break;
-                case 5:
-                    System.out.println("Introduce el nombre del proyecto a buscar:");
-                    String nomProyBuscar = br.readLine();
-                    break;
-                case 6:
-                    System.out.println("Introduce el id del proyecto a buscar:");
-                    int idProyBuscar = Integer.parseInt(br.readLine());
-                    break;
-                case 7:
-                    System.out.println("Introduce la ciudad del proyecto a buscar:");
-                    int ciudadProyBuscar = Integer.parseInt(br.readLine());
-                    break;
-                case 8:
-                    break;
-                default:
-                    System.out.println("Error: Introduce un numero entero del 1 al 7");
-            }
-        } while (opcion != 8);
+    // MÉTODOS COMUNES
+    // Recibe un List de objetos y los muestra
+    public static void mostrarLista(List<?> lista) {
+        System.out.println("------");
+        System.out.println("--- Mostrar lista ---");
+        for (int i = 0; i < lista.size(); i++) {
+            System.out.println(i + " - " + lista.get(i));
+        }
     }
 }
