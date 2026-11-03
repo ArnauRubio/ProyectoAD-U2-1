@@ -1,3 +1,4 @@
+import dao.ProveedorDao;
 import models.Gestion;
 import models.Pieza;
 import models.Proveedor;
@@ -17,7 +18,7 @@ public class App {
     static List<Proyecto> proyectos = new ArrayList<>();
     static List<Gestion> gestiones = new ArrayList<>();
 
-    //static ProveedorDao proveedorDao = new ProveedorDao();
+    static ProveedorDao proveedorDao = new ProveedorDao();
 
 
     public static void main(String[] args) throws IOException {
@@ -241,11 +242,299 @@ public class App {
     }
 
     public static void menuProveedores() throws IOException {
+        int opcion = -1;
+        do {
+            System.out.println("------");
+            System.out.print("=========\n" +
+                    "\tGestion de Proveedores\n" +
+                    "=========\n" +
+                    "\t1) Crear Proveedor\n" +
+                    "\t2) Editar Proveedor\n" +
+                    "\t3) Borrar Proveedor\n" +
+                    "\t4) Listado de Proveedores\n" +
+                    "\t5) Busqueda por Nombre de Proveedor\n" +
+                    "\t6) Busqueda por id de Proveedor\n" +
+                    "\t7) Busqueda por Direccion de Proveedor\n" +
+                    "\t8) Volver\n" +
+                    "--> Opción: "
+            );
+            try {
+                opcion = Integer.parseInt(br.readLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Valor no válido");
+            } catch (IOException e) {
+                System.out.println("Error");
+            }
 
+            switch (opcion) {
+                case 1:
+                    crearProveedor();
+                    break;
+                case 2:
+                    editarProveedor();
+                    break;
+                case 3:
+                    borrarProveedor();
+                    break;
+                case 4:
+                    // mostrarProveedor(proveedores);
+                    break;
+                case 5:
+
+                    break;
+                case 6:
+
+                    break;
+                case 7:
+                    break;
+                default:
+                    System.out.println("Error: Introduce un numero entero del 1 al 7");
+            }
+        } while (opcion != 7);
+    }
+
+    public static void crearProveedor() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Crear Proveedor ---");
+
+        System.out.print("Código: ");
+        String codigo = br.readLine();
+        System.out.print("Nombre: ");
+        String nombre = br.readLine();
+        System.out.print("Apellidos: ");
+        String apellidos = br.readLine();
+        System.out.print("Direccion: ");
+        String direccion = br.readLine();
+
+        Proveedor proveedor = new Proveedor(codigo, nombre, apellidos, direccion);
+        proveedores.add(proveedor);
+        //piezaDao.create(pieza);
+    }
+
+    public static void editarProveedor() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Editar Proveedor ---");
+
+        // Se muestra lista de proveedores y eligen una
+        mostrarLista(proveedores);
+
+        System.out.print("--> Editar: ");
+        int opcion = -1;
+        try {
+            opcion = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcion < 0 || opcion >= proveedores.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        // Nuevos valores
+//        System.out.print("Código: ");
+//        String codigo = br.readLine();
+        System.out.print("Nombre: ");
+        String nombre = br.readLine();
+        System.out.print("Apellidos: ");
+        String apellidos = br.readLine();
+        System.out.print("Direccion: ");
+        String direccion = br.readLine();
+
+        // Sobreescribir
+        Proveedor proveedor = proveedores.get(opcion);
+
+        proveedor.setNombre(nombre);
+        proveedor.setApellidos(apellidos);
+        proveedor.setDireccion(direccion);
+        //ProveedorDao.update(proveedor);
+    }
+
+    public static void borrarProveedor() {
+        System.out.println("------");
+        System.out.println("--- Eliminar Proveedor ---");
+
+        // Se muestra lista de proveedores y eligen uno
+        mostrarLista(proveedores);
+        System.out.print("--> Opción: ");
+
+        int opcion = -1;
+        try {
+            opcion = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcion < 0 || opcion >= proveedores.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        Proveedor aEliminar = proveedores.get(opcion);
+        // Un proveedor está en varias gestiones
+        for (Gestion gestion : aEliminar.getGestiones()) {
+            // Para cada una de esas gestiones
+            // Quitamos de la lista de gestiones de su proveedor
+            gestion.getProveedor().getGestiones().remove(gestion);
+            // Quitamos de la lista de gestiones de su proyecto
+            gestion.getProyecto().getGestiones().remove(gestion);
+            // Quitamos de la lista de gestiones de su pieza
+            aEliminar.getGestiones().remove(gestion);
+            gestiones.remove(gestion);
+        }
+        proveedores.remove(aEliminar);
     }
 
     public static void menuProyectos() throws IOException {
+        int opcion = -1;
+        do {
+            System.out.println("------");
+            System.out.print("=========\n" +
+                    "\tGestion de Proyectos\n" +
+                    "=========\n" +
+                    "\t1) Crear Proyecto\n" +
+                    "\t2) Editar Proyecto\n" +
+                    "\t3) Borrar Proyecto\n" +
+                    "\t4) Listado de Proyectos\n" +
+                    "\t5) Busqueda por Nombre de Proyectos\n" +
+                    "\t6) Busqueda por id de Proyectos\n" +
+                    "\t7) Busqueda por Ciudad de Proyectos\n" +
+                    "\t8) Volver\n" +
+                    "--> Opción: "
+            );
+            try {
+                opcion = Integer.parseInt(br.readLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Valor no válido");
+            } catch (IOException e) {
+                System.out.println("Error");
+            }
 
+            switch (opcion) {
+                case 1:
+                    crearProyecto();
+                    break;
+                case 2:
+                    editarProyecto();
+                    break;
+                case 3:
+                    borrarProyecto();
+                    break;
+                case 4:
+
+                    break;
+                case 5:
+
+                    break;
+                case 6:
+
+                    break;
+                case 7:
+                    break;
+                default:
+                    System.out.println("Error: Introduce un numero entero del 1 al 7");
+            }
+        } while (opcion != 7);
+    }
+
+    public static void crearProyecto() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Crear Proyecto ---");
+
+        System.out.print("Código: ");
+        String codigo = br.readLine();
+        System.out.print("Nombre: ");
+        String nombre = br.readLine();
+        System.out.print("Ciudad: ");
+        String ciudad = br.readLine();
+
+
+        Proyecto proyecto = new Proyecto(codigo, nombre, ciudad);
+        proyectos.add(proyecto);
+        //ProyectoDao.create(proyecto);
+    }
+
+    public static void editarProyecto() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Editar Proyecto ---");
+
+        // Se muestra lista de proyectos y eligen una
+        mostrarLista(proyectos);
+
+        System.out.print("--> Editar: ");
+        int opcion = -1;
+        try {
+            opcion = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcion < 0 || opcion >= proyectos.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        // Nuevos valores
+//        System.out.print("Código: ");
+//        String codigo = br.readLine();
+        System.out.print("Nombre: ");
+        String nombre = br.readLine();
+        System.out.print("Ciudad: ");
+        String ciudad = br.readLine();
+
+        // Sobreescribir
+        Proyecto proyecto = proyectos.get(opcion);
+
+        proyecto.setNombre(nombre);
+        proyecto.setCiudad(ciudad);
+        //ProyectoDao.update(proyecto);
+    }
+
+    public static void borrarProyecto() {
+        System.out.println("------");
+        System.out.println("--- Eliminar Proyecto ---");
+
+        // Se muestra lista de proveedores y eligen uno
+        mostrarLista(proyectos);
+        System.out.print("--> Opción: ");
+
+        int opcion = -1;
+        try {
+            opcion = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcion < 0 || opcion >= proyectos.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        Proyecto aEliminar = proyectos.get(opcion);
+        // Un proveedor está en varias gestiones
+        for (Gestion gestion : aEliminar.getGestiones()) {
+            // Para cada una de esas gestiones
+            // Quitamos de la lista de gestiones de su proveedor
+            gestion.getProyecto().getGestiones().remove(gestion);
+            // Quitamos de la lista de gestiones de su proyecto
+            gestion.getProyecto().getGestiones().remove(gestion);
+            // Quitamos de la lista de gestiones de su pieza
+            aEliminar.getGestiones().remove(gestion);
+            gestiones.remove(gestion);
+        }
+        proyectos.remove(aEliminar);
     }
 
 
