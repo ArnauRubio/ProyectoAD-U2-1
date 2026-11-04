@@ -73,7 +73,7 @@ public class App {
                     "\t3) Borrar pieza\n" +
                     "\t4) Listado de piezas\n" +
                     "\t5) Búsqueda por nombre de pieza\n" +
-                    "\t6) Búsqueda por id de pieza\n" +
+                    "\t6) Búsqueda por código de pieza\n" +
                     "\t7) Volver\n" +
                     "--> Opción: "
             );
@@ -99,14 +99,13 @@ public class App {
                     mostrarLista(piezas);
                     break;
                 case 5:
-                    System.out.println("Introduce el nombre de la pieza a buscar:");
-                    String nomPiezaBuscar = br.readLine();
+                    buscarPiezaPorNombre();
                     break;
                 case 6:
-                    System.out.println("Introduce el id de la pieza a buscar:");
-                    int idPiezaBuscar = Integer.parseInt(br.readLine());
+                    buscarPiezaPorCodigo();
                     break;
                 case 7:
+                    System.out.println("*Volviendo al menú principal");
                     break;
                 default:
                     System.out.println("Error: Introduce un numero entero del 1 al 7");
@@ -138,7 +137,7 @@ public class App {
         //Dao
         Pieza pieza = new Pieza(codigo, nombre, precio, descripcion);
         piezas.add(pieza);
-        piezaDao.create(new Pieza(codigo, nombre, precio, descripcion));
+        piezaDao.create(pieza);
     }
 
     public static void editarPieza() throws IOException {
@@ -164,9 +163,7 @@ public class App {
             return;
         }
 
-        /* Nuevos valores
-          System.out.print("Código: ");
-          String codigo = br.readLine();*/
+        // Nuevos valores
         System.out.print("Nombre: ");
         String nombre = br.readLine();
 
@@ -194,17 +191,10 @@ public class App {
         pieza.setDescripcion(descripcion);
 
         //Dao
-        Pieza piezaEditada = piezaDao.buscarPorCodigo(pieza.getCodigo());
-        if (piezaEditada == null) {
-            System.out.println("No existe esa pieza.");
-        } else {
-            piezaEditada.setNombre(nombre);
-            piezaDao.update(piezaEditada);
-            piezaEditada.setPrecio(precio);
-            piezaDao.update(piezaEditada);
-            piezaEditada.setDescripcion(descripcion);
-            piezaDao.update(piezaEditada);
-        }
+        piezaDao.update(pieza);
+        piezaDao.update(pieza);
+        piezaDao.update(pieza);
+
     }
 
     public static void borrarPieza() {
@@ -245,8 +235,7 @@ public class App {
         piezas.remove(aEliminar);
 
         //Dao
-        Pieza piezaEliminada = piezaDao.buscarPorCodigo(aEliminar.getCodigo());
-        if (piezaEliminada != null) piezaDao.delete(piezaEliminada);   // lanza excepción si tiene suministros
+        piezaDao.delete(aEliminar);   // lanza excepción si tiene suministros
     }
 
     public static void buscarPiezaPorNombre() throws IOException {
@@ -256,9 +245,44 @@ public class App {
         System.out.print("Nombre: ");
         String nombre = br.readLine();
 
+        boolean encontrada = false;
         for (Pieza pieza : piezas) {
             if (pieza.getNombre().equalsIgnoreCase(nombre)) {
+                System.out.println("- Pieza encontrada -");
+                System.out.println("--> Código: " + pieza.getCodigo());
+                System.out.println("--> Nombre: " + pieza.getNombre());
+                System.out.println("--> Precio: " + pieza.getPrecio());
+                System.out.println("--> Descripción: " + pieza.getDescripcion());
+
+                encontrada = true;
             }
+        }
+        if (!encontrada) {
+            System.out.println("No se ha podido encontrar la pieza");
+        }
+    }
+
+    public static void buscarPiezaPorCodigo() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Buscar pieza por código ---");
+
+        System.out.print("Código: ");
+        String cod = br.readLine();
+
+        boolean encontrada = false;
+        for (Pieza pieza : piezas) {
+            if (pieza.getCodigo().equalsIgnoreCase(cod)) {
+                System.out.println("- Pieza encontrada -");
+                System.out.println("--> Código: " + pieza.getCodigo());
+                System.out.println("--> Nombre: " + pieza.getNombre());
+                System.out.println("--> Precio: " + pieza.getPrecio());
+                System.out.println("--> Descripción: " + pieza.getDescripcion());
+
+                encontrada = true;
+            }
+        }
+        if (!encontrada) {
+            System.out.println("No se ha podido encontrar la pieza");
         }
     }
 
@@ -266,16 +290,14 @@ public class App {
         int opcion = -1;
         do {
             System.out.println("------");
-            System.out.print("=========\n" +
-                    "\tGestion de Proveedores\n" +
-                    "=========\n" +
-                    "\t1) Crear Proveedor\n" +
-                    "\t2) Editar Proveedor\n" +
-                    "\t3) Borrar Proveedor\n" +
-                    "\t4) Listado de Proveedores\n" +
-                    "\t5) Busqueda por Nombre de Proveedor\n" +
-                    "\t6) Busqueda por id de Proveedor\n" +
-                    "\t7) Busqueda por Direccion de Proveedor\n" +
+            System.out.print("=== Menú proveedores ===" +
+                    "\t1) Crear proveedor\n" +
+                    "\t2) Editar proveedor\n" +
+                    "\t3) Borrar proveedor\n" +
+                    "\t4) Listado de proveedores\n" +
+                    "\t5) Búsqueda por nombre de proveedor\n" +
+                    "\t6) Búsqueda por código de proveedor\n" +
+                    "\t7) Búsqueda por dirección de proveedor\n" +
                     "\t8) Volver\n" +
                     "--> Opción: "
             );
@@ -298,25 +320,29 @@ public class App {
                     borrarProveedor();
                     break;
                 case 4:
-                    // mostrarProveedor(proveedores);
+                    mostrarLista(proveedores);
                     break;
                 case 5:
-
+                    buscarProveedorPorNombre();
                     break;
                 case 6:
-
+                    buscarProveedorPorCodigo();
                     break;
                 case 7:
+                    buscarProveedorPorDireccion();
+                    break;
+                case 8:
+                    System.out.println("*Volviendo al menú principal");
                     break;
                 default:
                     System.out.println("Error: Introduce un numero entero del 1 al 7");
             }
-        } while (opcion != 7);
+        } while (opcion != 8);
     }
 
     public static void crearProveedor() throws IOException {
         System.out.println("------");
-        System.out.println("--- Crear Proveedor ---");
+        System.out.println("--- Crear proveedor ---");
 
         System.out.print("Código: ");
         String codigo = br.readLine();
@@ -330,13 +356,12 @@ public class App {
         //Dao
         Proveedor proveedor = new Proveedor(codigo, nombre, apellidos, direccion);
         proveedores.add(proveedor);
-
-        proveedorDao.create(new Proveedor(codigo, nombre, apellidos, direccion));
+        proveedorDao.create(proveedor);
     }
 
     public static void editarProveedor() throws IOException {
         System.out.println("------");
-        System.out.println("--- Editar Proveedor ---");
+        System.out.println("--- Editar proveedor ---");
 
         // Se muestra lista de proveedores y eligen una
         mostrarLista(proveedores);
@@ -358,8 +383,6 @@ public class App {
         }
 
         // Nuevos valores
-//        System.out.print("Código: ");
-//        String codigo = br.readLine();
         System.out.print("Nombre: ");
         String nombre = br.readLine();
         System.out.print("Apellidos: ");
@@ -391,7 +414,7 @@ public class App {
 
     public static void borrarProveedor() {
         System.out.println("------");
-        System.out.println("--- Eliminar Proveedor ---");
+        System.out.println("--- Eliminar proveedor ---");
 
         // Se muestra lista de proveedores y eligen uno
         mostrarLista(proveedores);
@@ -428,16 +451,87 @@ public class App {
 
         //Dao
         Proveedor proveedorEliminado = proveedorDao.buscarPorCodigo(aEliminar.getCodigo());
-        if (proveedorEliminado != null) proveedorDao.delete(proveedorEliminado);   // lanza excepción si tiene suministros
+        if (proveedorEliminado != null)
+            proveedorDao.delete(proveedorEliminado);   // lanza excepción si tiene suministros
+    }
+
+    public static void buscarProveedorPorNombre() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Buscar proveedor por nombre ---");
+
+        System.out.print("Nombre: ");
+        String nombre = br.readLine();
+
+        boolean encontrada = false;
+        for (Proveedor proveedor : proveedores) {
+            if (proveedor.getNombre().equalsIgnoreCase(nombre)) {
+                System.out.println("- Proveedor encontrado -");
+                System.out.println("--> Código: " + proveedor.getCodigo());
+                System.out.println("--> Nombre: " + proveedor.getNombre());
+                System.out.println("--> Apellidos: " + proveedor.getApellidos());
+                System.out.println("--> Dirección: " + proveedor.getDireccion());
+
+                encontrada = true;
+            }
+        }
+        if (!encontrada) {
+            System.out.println("No se ha podido encontrar el proveedor");
+        }
+    }
+
+    public static void buscarProveedorPorCodigo() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Buscar proveedor por código ---");
+
+        System.out.print("Código: ");
+        String cod = br.readLine();
+
+        boolean encontrada = false;
+        for (Proveedor proveedor : proveedores) {
+            if (proveedor.getCodigo().equalsIgnoreCase(cod)) {
+                System.out.println("- Proveedor encontrado -");
+                System.out.println("--> Código: " + proveedor.getCodigo());
+                System.out.println("--> Nombre: " + proveedor.getNombre());
+                System.out.println("--> Apellidos: " + proveedor.getApellidos());
+                System.out.println("--> Dirección: " + proveedor.getDireccion());
+
+                encontrada = true;
+            }
+        }
+        if (!encontrada) {
+            System.out.println("No se ha podido encontrar el proveedor");
+        }
+    }
+
+    public static void buscarProveedorPorDireccion() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Buscar proveedor por dirección ---");
+
+        System.out.print("Dirección: ");
+        String dir = br.readLine();
+
+        boolean encontrada = false;
+        for (Proveedor proveedor : proveedores) {
+            if (proveedor.getDireccion().equalsIgnoreCase(dir)) {
+                System.out.println("- Proveedor encontrado -");
+                System.out.println("--> Código: " + proveedor.getCodigo());
+                System.out.println("--> Nombre: " + proveedor.getNombre());
+                System.out.println("--> Apellidos: " + proveedor.getApellidos());
+                System.out.println("--> Dirección: " + proveedor.getDireccion());
+
+                encontrada = true;
+            }
+        }
+        if (!encontrada) {
+            System.out.println("No se ha podido encontrar el proveedor");
+        }
     }
 
     public static void menuProyectos() throws IOException {
         int opcion = -1;
         do {
             System.out.println("------");
-            System.out.print("=========\n" +
-                    "\tGestion de Proyectos\n" +
-                    "=========\n" +
+            System.out.print("=== Menú proyectos ===" +
                     "\t1) Crear Proyecto\n" +
                     "\t2) Editar Proyecto\n" +
                     "\t3) Borrar Proyecto\n" +
@@ -467,20 +561,23 @@ public class App {
                     borrarProyecto();
                     break;
                 case 4:
-
+                    mostrarLista(proyectos);
                     break;
                 case 5:
-
+                    buscarProyectoPorNombre();
                     break;
                 case 6:
-
+                    buscarProyectoPorCodigo();
                     break;
                 case 7:
+                    buscarProyectoPorCiudad();
                     break;
+                case 8:
+                    System.out.println("*Volviendo al menú principal");
                 default:
                     System.out.println("Error: Introduce un numero entero del 1 al 7");
             }
-        } while (opcion != 7);
+        } while (opcion != 8);
     }
 
     public static void crearProyecto() throws IOException {
@@ -546,7 +643,7 @@ public class App {
         } else {
             proyectoEditado.setNombre(nombre);
             proyectoDao.update(proyectoEditado);
-             proyectoEditado.setCiudad(ciudad);
+            proyectoEditado.setCiudad(ciudad);
             proyectoDao.update(proyectoEditado);
 
         }
@@ -592,6 +689,80 @@ public class App {
         //Dao
         Proyecto proyectoEliminado = proyectoDao.buscarPorCodigo(aEliminar.getCodigo());
         if (proyectoEliminado != null) proyectoDao.delete(proyectoEliminado);   // lanza excepción si tiene suministros
+    }
+
+    public static void buscarProyectoPorNombre() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Buscar proyecto por nombre ---");
+
+        System.out.print("Nombre: ");
+        String nombre = br.readLine();
+
+        boolean encontrada = false;
+        for (Proyecto proyecto : proyectos) {
+            if (proyecto.getNombre().equalsIgnoreCase(nombre)) {
+                System.out.println("- Proyecto encontrado -");
+                System.out.println("--> Código: " + proyecto.getCodigo());
+                System.out.println("--> Nombre: " + proyecto.getNombre());
+                System.out.println("--> Ciudad: " + proyecto.getCiudad());
+
+                encontrada = true;
+            }
+        }
+        if (!encontrada) {
+            System.out.println("No se ha podido encontrar el proyecto");
+        }
+    }
+
+    public static void buscarProyectoPorCodigo() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Buscar proyecto por código ---");
+
+        System.out.print("Código: ");
+        String cod = br.readLine();
+
+        boolean encontrada = false;
+        for (Proyecto proyecto : proyectos) {
+            if (proyecto.getCodigo().equalsIgnoreCase(cod)) {
+                System.out.println("- Proyecto encontrado -");
+                System.out.println("--> Código: " + proyecto.getCodigo());
+                System.out.println("--> Nombre: " + proyecto.getNombre());
+                System.out.println("--> Ciudad: " + proyecto.getCiudad());
+
+                encontrada = true;
+            }
+        }
+        if (!encontrada) {
+            System.out.println("No se ha podido encontrar el proyecto");
+        }
+    }
+
+    public static void buscarProyectoPorCiudad() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Buscar proyecto por ciudad ---");
+
+        System.out.print("Ciudad: ");
+        String ciudad = br.readLine();
+
+        boolean encontrada = false;
+        List<Proyecto> encontradas = new ArrayList<>();
+        for (Proyecto proyecto : proyectos) {
+            if (proyecto.getCiudad().equalsIgnoreCase(ciudad)) {
+                encontradas.add(proyecto);
+                encontrada = true;
+            }
+        }
+        if (!encontrada) {
+            System.out.println("No se ha podido encontrar el proyecto");
+        } else {
+            System.out.println("- Proyecto(s) encontrado(s) -");
+            for (Proyecto pr : encontradas) {
+                System.out.println("--> Código: " + pr.getCodigo());
+                System.out.println("--> Nombre: " + pr.getNombre());
+                System.out.println("--> Ciudad: " + pr.getCiudad());
+                System.out.println("----------");
+            }
+        }
     }
 
 
