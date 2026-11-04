@@ -1,4 +1,6 @@
+import dao.PiezaDao;
 import dao.ProveedorDao;
+import dao.ProyectoDao;
 import models.Gestion;
 import models.Pieza;
 import models.Proveedor;
@@ -18,7 +20,9 @@ public class App {
     static List<Proyecto> proyectos = new ArrayList<>();
     static List<Gestion> gestiones = new ArrayList<>();
 
+    static PiezaDao piezaDao = new PiezaDao();
     static ProveedorDao proveedorDao = new ProveedorDao();
+    static ProyectoDao proyectoDao = new ProyectoDao();
 
 
     public static void main(String[] args) throws IOException {
@@ -131,9 +135,10 @@ public class App {
         System.out.print("Descripción: ");
         String descripcion = br.readLine();
 
+        //Dao
         Pieza pieza = new Pieza(codigo, nombre, precio, descripcion);
         piezas.add(pieza);
-        //piezaDao.create(pieza);
+        piezaDao.create(new Pieza(codigo, nombre, precio, descripcion));
     }
 
     public static void editarPieza() throws IOException {
@@ -159,9 +164,9 @@ public class App {
             return;
         }
 
-        // Nuevos valores
-//        System.out.print("Código: ");
-//        String codigo = br.readLine();
+        /* Nuevos valores
+          System.out.print("Código: ");
+          String codigo = br.readLine();*/
         System.out.print("Nombre: ");
         String nombre = br.readLine();
 
@@ -187,7 +192,19 @@ public class App {
         pieza.setNombre(nombre);
         pieza.setPrecio(precio);
         pieza.setDescripcion(descripcion);
-        //piezaDao.update(pieza);
+
+        //Dao
+        Pieza piezaEditada = piezaDao.buscarPorCodigo(pieza.getCodigo());
+        if (piezaEditada == null) {
+            System.out.println("No existe esa pieza.");
+        } else {
+            piezaEditada.setNombre(nombre);
+            piezaDao.update(piezaEditada);
+            piezaEditada.setPrecio(precio);
+            piezaDao.update(piezaEditada);
+            piezaEditada.setDescripcion(descripcion);
+            piezaDao.update(piezaEditada);
+        }
     }
 
     public static void borrarPieza() {
@@ -226,6 +243,10 @@ public class App {
             gestiones.remove(gestion);
         }
         piezas.remove(aEliminar);
+
+        //Dao
+        Pieza piezaEliminada = piezaDao.buscarPorCodigo(aEliminar.getCodigo());
+        if (piezaEliminada != null) piezaDao.delete(piezaEliminada);   // lanza excepción si tiene suministros
     }
 
     public static void buscarPiezaPorNombre() throws IOException {
@@ -306,9 +327,11 @@ public class App {
         System.out.print("Direccion: ");
         String direccion = br.readLine();
 
+        //Dao
         Proveedor proveedor = new Proveedor(codigo, nombre, apellidos, direccion);
         proveedores.add(proveedor);
-        //piezaDao.create(pieza);
+
+        proveedorDao.create(new Proveedor(codigo, nombre, apellidos, direccion));
     }
 
     public static void editarProveedor() throws IOException {
@@ -350,7 +373,20 @@ public class App {
         proveedor.setNombre(nombre);
         proveedor.setApellidos(apellidos);
         proveedor.setDireccion(direccion);
-        //ProveedorDao.update(proveedor);
+
+        //Dao
+        Proveedor proveedorEditado = proveedorDao.buscarPorCodigo(proveedor.getCodigo());
+        if (proveedorEditado == null) {
+            System.out.println("No existe ese proveedor.");
+        } else {
+            proveedorEditado.setNombre(nombre);
+            proveedorDao.update(proveedorEditado);
+            proveedorEditado.setApellidos(apellidos);
+            proveedorDao.update(proveedorEditado);
+            proveedorEditado.setDireccion(direccion);
+            proveedorDao.update(proveedorEditado);
+
+        }
     }
 
     public static void borrarProveedor() {
@@ -389,6 +425,10 @@ public class App {
             gestiones.remove(gestion);
         }
         proveedores.remove(aEliminar);
+
+        //Dao
+        Proveedor proveedorEliminado = proveedorDao.buscarPorCodigo(aEliminar.getCodigo());
+        if (proveedorEliminado != null) proveedorDao.delete(proveedorEliminado);   // lanza excepción si tiene suministros
     }
 
     public static void menuProyectos() throws IOException {
@@ -457,7 +497,9 @@ public class App {
 
         Proyecto proyecto = new Proyecto(codigo, nombre, ciudad);
         proyectos.add(proyecto);
-        //ProyectoDao.create(proyecto);
+
+        //Dao
+        proyectoDao.create(new Proyecto(codigo, nombre, ciudad));
     }
 
     public static void editarProyecto() throws IOException {
@@ -496,7 +538,18 @@ public class App {
 
         proyecto.setNombre(nombre);
         proyecto.setCiudad(ciudad);
-        //ProyectoDao.update(proyecto);
+
+        //Dao
+        Proyecto proyectoEditado = proyectoDao.buscarPorCodigo(proyecto.getCodigo());
+        if (proyectoEditado == null) {
+            System.out.println("No existe ese proyecto.");
+        } else {
+            proyectoEditado.setNombre(nombre);
+            proyectoDao.update(proyectoEditado);
+             proyectoEditado.setCiudad(ciudad);
+            proyectoDao.update(proyectoEditado);
+
+        }
     }
 
     public static void borrarProyecto() {
@@ -535,6 +588,10 @@ public class App {
             gestiones.remove(gestion);
         }
         proyectos.remove(aEliminar);
+
+        //Dao
+        Proyecto proyectoEliminado = proyectoDao.buscarPorCodigo(aEliminar.getCodigo());
+        if (proyectoEliminado != null) proyectoDao.delete(proyectoEliminado);   // lanza excepción si tiene suministros
     }
 
 
