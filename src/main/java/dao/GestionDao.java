@@ -26,33 +26,25 @@ public class GestionDao extends Dao<Gestion, Integer> implements IGestionDao {
     }
 
     @Override
-    public Gestion create(Gestion g) {
-        validar(g);
-        return super.create(g);
-    }
-
-    @Override
-    public Gestion update(Gestion g) {
-        validar(g);
-        return super.update(g);
-    }
-
-    /** @throws IllegalArgumentException si los datos no son válidos */
-    private void validar(Gestion g) {
-        if (g.getCantidad() <= 0) {
+    protected void validar(Gestion g) {
+        if (g.getCantidad() == null || g.getCantidad() <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor que 0.");
         }
         if (g.getFecha() == null) {
             throw new IllegalArgumentException("La fecha es obligatoria.");
         }
-        if (g.getProveedor() == null || em.find(Proveedor.class, g.getProveedor().getCodigo()) == null) {
+        if (g.getProveedor() == null || !existe(Proveedor.class, g.getProveedor().getId())) {
             throw new IllegalArgumentException("El proveedor indicado no existe.");
         }
-        if (g.getPieza() == null || em.find(Pieza.class, g.getPieza().getCodigo()) == null) {
+        if (g.getPieza() == null || !existe(Pieza.class, g.getPieza().getId())) {
             throw new IllegalArgumentException("La pieza indicada no existe.");
         }
-        if (g.getProyecto() == null || em.find(Proyecto.class, g.getProyecto().getCodigo()) == null) {
+        if (g.getProyecto() == null || !existe(Proyecto.class, g.getProyecto().getId())) {
             throw new IllegalArgumentException("El proyecto indicado no existe.");
         }
+    }
+
+    private boolean existe(Class<?> clase, Integer id) {
+        return id != null && em.find(clase, id) != null;
     }
 }

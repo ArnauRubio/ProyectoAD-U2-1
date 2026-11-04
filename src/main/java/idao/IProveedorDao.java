@@ -4,7 +4,10 @@ import models.Proveedor;
 
 import java.util.List;
 
-public interface IProveedorDao extends IDao<Proveedor, String> {
+public interface IProveedorDao extends IDao<Proveedor, Integer> {
+
+    /** @return el proveedor con ese código o null si no existe */
+    Proveedor buscarPorCodigo(String codigo);
 
     List<Proveedor> buscarPorNombre(String nombre);
 

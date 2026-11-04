@@ -4,7 +4,10 @@ import models.Pieza;
 
 import java.util.List;
 
-public interface IPiezaDao extends IDao<Pieza, String> {
+public interface IPiezaDao extends IDao<Pieza, Integer> {
+
+    /** @return la pieza con ese código o null si no existe */
+    Pieza buscarPorCodigo(String codigo);
 
     List<Pieza> buscarPorNombre(String nombre);
 

@@ -5,11 +5,11 @@ import models.Proveedor;
 
 import java.util.List;
 
-public class ProveedorDao extends Dao<Proveedor, String> implements IProveedorDao {
+public class ProveedorDao extends Dao<Proveedor, Integer> implements IProveedorDao {
 
     // ---- Consultas JPQL ----
     private static final String CONTAR_SUMINISTROS =
-            "SELECT COUNT(g) FROM Gestion g WHERE g.proveedor.codigo = :cod";
+            "SELECT COUNT(g) FROM Gestion g WHERE g.proveedor.id = :id";
     private static final String POR_NOMBRE =
             "FROM Proveedor p WHERE LOWER(p.nombre) LIKE :v";
     private static final String POR_APELLIDOS =
@@ -24,9 +24,19 @@ public class ProveedorDao extends Dao<Proveedor, String> implements IProveedorDa
     }
 
     @Override
-    protected Integer contarSuministros(Object codigo) {
-        return em.createQuery(CONTAR_SUMINISTROS, Integer.class)
-                .setParameter("cod", codigo).getSingleResult();
+    protected void validar(Proveedor p) {
+        comprobarCodigoUnico(p.getCodigo(), p.getId());
+    }
+
+    @Override
+    protected long contarSuministros(Object id) {
+        return em.createQuery(CONTAR_SUMINISTROS, Long.class)
+                .setParameter("id", id).getSingleResult();
+    }
+
+    @Override
+    public Proveedor buscarPorCodigo(String codigo) {
+        return porCodigo(codigo);
     }
 
     @Override

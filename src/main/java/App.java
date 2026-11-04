@@ -380,11 +380,11 @@ public class App {
         // Un proveedor está en varias gestiones
         for (Gestion gestion : aEliminar.getGestiones()) {
             // Para cada una de esas gestiones
-            // Quitamos de la lista de gestiones de su proveedor
-            gestion.getProveedor().getGestiones().remove(gestion);
+            // Quitamos de la lista de gestiones de su pieza
+            gestion.getPieza().getGestiones().remove(gestion);
             // Quitamos de la lista de gestiones de su proyecto
             gestion.getProyecto().getGestiones().remove(gestion);
-            // Quitamos de la lista de gestiones de su pieza
+            // Quitamos de la lista de gestiones de su proveedor
             aEliminar.getGestiones().remove(gestion);
             gestiones.remove(gestion);
         }
@@ -526,11 +526,11 @@ public class App {
         // Un proveedor está en varias gestiones
         for (Gestion gestion : aEliminar.getGestiones()) {
             // Para cada una de esas gestiones
-            // Quitamos de la lista de gestiones de su proveedor
-            gestion.getProyecto().getGestiones().remove(gestion);
-            // Quitamos de la lista de gestiones de su proyecto
-            gestion.getProyecto().getGestiones().remove(gestion);
             // Quitamos de la lista de gestiones de su pieza
+            gestion.getPieza().getGestiones().remove(gestion);
+            // Quitamos de la lista de gestiones de su proveedor
+            gestion.getProveedor().getGestiones().remove(gestion);
+            // Quitamos de la lista de gestiones de su proyecto
             aEliminar.getGestiones().remove(gestion);
             gestiones.remove(gestion);
         }

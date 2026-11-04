@@ -5,11 +5,11 @@ import models.Pieza;
 
 import java.util.List;
 
-public class PiezaDao extends Dao<Pieza, String> implements IPiezaDao {
+public class PiezaDao extends Dao<Pieza, Integer> implements IPiezaDao {
 
     // ---- Consultas JPQL ----
     private static final String CONTAR_SUMINISTROS =
-            "SELECT COUNT(g) FROM Gestion g WHERE g.pieza.codigo = :cod";
+            "SELECT COUNT(g) FROM Gestion g WHERE g.pieza.id = :id";
     private static final String POR_NOMBRE =
             "FROM Pieza p WHERE LOWER(p.nombre) LIKE :v";
     private static final String POR_PRECIO =
@@ -24,9 +24,22 @@ public class PiezaDao extends Dao<Pieza, String> implements IPiezaDao {
     }
 
     @Override
-    protected Integer contarSuministros(Object codigo) {
-        return em.createQuery(CONTAR_SUMINISTROS, Integer.class)
-                .setParameter("cod", codigo).getSingleResult();
+    protected void validar(Pieza p) {
+        comprobarCodigoUnico(p.getCodigo(), p.getId());
+        if (p.getPrecio() < 0) {
+            throw new IllegalArgumentException("El precio no puede ser negativo.");
+        }
+    }
+
+    @Override
+    protected long contarSuministros(Object id) {
+        return em.createQuery(CONTAR_SUMINISTROS, Long.class)
+                .setParameter("id", id).getSingleResult();
+    }
+
+    @Override
+    public Pieza buscarPorCodigo(String codigo) {
+        return porCodigo(codigo);
     }
 
     @Override

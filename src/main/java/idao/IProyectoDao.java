@@ -4,7 +4,10 @@ import models.Proyecto;
 
 import java.util.List;
 
-public interface IProyectoDao extends IDao<Proyecto, String> {
+public interface IProyectoDao extends IDao<Proyecto, Integer> {
+
+    /** @return el proyecto con ese código o null si no existe */
+    Proyecto buscarPorCodigo(String codigo);
 
     List<Proyecto> buscarPorNombre(String nombre);
 

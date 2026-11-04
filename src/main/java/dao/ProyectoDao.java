@@ -5,11 +5,11 @@ import models.Proyecto;
 
 import java.util.List;
 
-public class ProyectoDao extends Dao<Proyecto, String> implements IProyectoDao {
+public class ProyectoDao extends Dao<Proyecto, Integer> implements IProyectoDao {
 
     // ---- Consultas JPQL ----
     private static final String CONTAR_SUMINISTROS =
-            "SELECT COUNT(g) FROM Gestion g WHERE g.proyecto.codigo = :cod";
+            "SELECT COUNT(g) FROM Gestion g WHERE g.proyecto.id = :id";
     private static final String POR_NOMBRE =
             "FROM Proyecto p WHERE LOWER(p.nombre) LIKE :v";
     private static final String POR_CIUDAD =
@@ -24,9 +24,19 @@ public class ProyectoDao extends Dao<Proyecto, String> implements IProyectoDao {
     }
 
     @Override
-    protected Integer contarSuministros(Object codigo) {
-        return em.createQuery(CONTAR_SUMINISTROS, Integer.class)
-                .setParameter("cod", codigo).getSingleResult();
+    protected void validar(Proyecto p) {
+        comprobarCodigoUnico(p.getCodigo(), p.getId());
+    }
+
+    @Override
+    protected long contarSuministros(Object id) {
+        return em.createQuery(CONTAR_SUMINISTROS, Long.class)
+                .setParameter("id", id).getSingleResult();
+    }
+
+    @Override
+    public Proyecto buscarPorCodigo(String codigo) {
+        return porCodigo(codigo);
     }
 
     @Override

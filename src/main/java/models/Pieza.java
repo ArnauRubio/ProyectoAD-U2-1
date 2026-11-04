@@ -14,6 +14,7 @@ public class Pieza {
     private Integer id;
 
     @NotNull
+    @Column(unique = true)
     private String codigo;
 
     @NotNull

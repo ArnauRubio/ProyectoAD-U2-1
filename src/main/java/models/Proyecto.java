@@ -14,6 +14,7 @@ public class Proyecto {
     private Integer id;
 
     @NotNull
+    @Column(unique = true)
     private String codigo;
 
     @NotNull
@@ -23,7 +24,7 @@ public class Proyecto {
     @NotNull
     private String ciudad;
 
-    @OneToMany(mappedBy = "proyeto", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "proyecto", fetch = FetchType.LAZY)
     private List<Gestion> gestiones;
 
     public Proyecto() {

@@ -59,11 +59,8 @@ public abstract class Dao<T, K> implements IDao<T, K> {
 
     @Override
     public T create(T t) {
+        validar(t);
         return enTransaccion(() -> {
-            Object id = idDe(t);
-            if (id != null && em.find(clase, id) != null) {
-                throw new IllegalStateException("Ya existe un registro con el código '" + id + "'.");
-            }
             em.persist(t);
             return t;
         });
@@ -71,10 +68,11 @@ public abstract class Dao<T, K> implements IDao<T, K> {
 
     @Override
     public T update(T t) {
+        validar(t);
         return enTransaccion(() -> {
             Object id = idDe(t);
             if (id == null || em.find(clase, id) == null) {
-                throw new IllegalStateException("No existe ningún registro con el código '" + id + "'.");
+                throw new IllegalStateException("El registro que se quiere modificar no existe.");
             }
             return em.merge(t);
         });
@@ -86,9 +84,9 @@ public abstract class Dao<T, K> implements IDao<T, K> {
             Object id = idDe(t);
             T existente = (id == null) ? null : em.find(clase, id);
             if (existente == null) {
-                throw new IllegalStateException("No existe ningún registro con el código '" + id + "'.");
+                throw new IllegalStateException("El registro que se quiere eliminar no existe.");
             }
-            Integer n = contarSuministros(id);
+            long n = contarSuministros(id);
             if (n > 0) {
                 throw new IllegalStateException(
                         "No se puede eliminar: tiene " + n + " suministro(s) asociado(s).");
@@ -98,11 +96,36 @@ public abstract class Dao<T, K> implements IDao<T, K> {
         });
     }
 
-    // ---------- Utilidades para las subclases ----------
+    // ---------- Para las subclases ----------
+
+    /** Validaciones previas a create y update. Por defecto no hace nada. */
+    protected void validar(T t) {
+    }
 
     /** Nº de suministros asociados. Por defecto 0; lo sobrescriben Proveedor, Pieza y Proyecto. */
-    protected Integer contarSuministros(Object id) {
+    protected long contarSuministros(Object id) {
         return 0;
+    }
+
+    /** Busca por el campo "codigo". @return la entidad o null */
+    protected T porCodigo(String codigo) {
+        List<T> r = consulta("FROM " + clase.getSimpleName() + " e WHERE e.codigo = :c")
+                .setParameter("c", codigo).getResultList();
+        return r.isEmpty() ? null : r.get(0);
+    }
+
+    /**
+     * Comprueba que el código no esté vacío y que no lo use otro registro.
+     * @param idPropio id de la entidad que se guarda (null si es nueva)
+     */
+    protected void comprobarCodigoUnico(String codigo, Integer idPropio) {
+        if (codigo == null || codigo.isBlank()) {
+            throw new IllegalArgumentException("El código es obligatorio.");
+        }
+        T otro = porCodigo(codigo);
+        if (otro != null && !idDe(otro).equals(idPropio)) {
+            throw new IllegalStateException("Ya existe un registro con el código '" + codigo + "'.");
+        }
     }
 
     /** Crea una consulta JPQL que devuelve entidades de este DAO. */
