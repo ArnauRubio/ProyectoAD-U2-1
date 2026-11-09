@@ -20,5 +20,9 @@
             <property name="hibernate.hbm2ddl.auto"
                       value="update"/>
         </properties>
+        <class>models.Proveedor</class>
+        <class>models.Pieza</class>
+        <class>models.Proyecto</class>
+        <class>models.Gestion</class>
     </persistence-unit>
 </persistence>

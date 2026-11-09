@@ -9,6 +9,7 @@ import models.Proyecto;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,8 @@ public class App {
 
 
     public static void main(String[] args) throws IOException {
+        cargarDatosIniciales();
+
         int opcion = -1;
         do {
             System.out.print("=========\n" +
@@ -34,7 +37,8 @@ public class App {
                     "\t1) Proveedores\n" +
                     "\t2) Piezas\n" +
                     "\t3) Proyectos\n" +
-                    "\t4) Salir\n" +
+                    "\t4) Gestiones\n" +
+                    "\t5) Salir\n" +
                     "--> Opción: "
             );
             try {
@@ -56,10 +60,26 @@ public class App {
                 case 3:
                     menuProyectos();
                     break;
+                case 4:
+                    menuGestiones();
+                    break;
+                    case 5:
+                        break;
                 default:
                     System.out.println("Selecciona una opción válida");
             }
-        } while (opcion != 4);
+        } while (opcion != 5);
+    }
+
+    private static void cargarDatosIniciales() {
+        proveedores.clear();
+        proveedores.addAll(proveedorDao.findAll());
+
+        piezas.clear();
+        piezas.addAll(piezaDao.findAll());
+
+        proyectos.clear();
+        proyectos.addAll(proyectoDao.findAll());
     }
 
     // PIEZAS
@@ -67,7 +87,7 @@ public class App {
         int opcion = -1;
         do {
             System.out.println("------");
-            System.out.print("=== Menú piezas ===" +
+            System.out.print("=== Menú piezas ===\n" +
                     "\t1) Crear pieza\n" +
                     "\t2) Editar pieza\n" +
                     "\t3) Borrar pieza\n" +
@@ -290,7 +310,7 @@ public class App {
         int opcion = -1;
         do {
             System.out.println("------");
-            System.out.print("=== Menú proveedores ===" +
+            System.out.print("=== Menú proveedores ===\n" +
                     "\t1) Crear proveedor\n" +
                     "\t2) Editar proveedor\n" +
                     "\t3) Borrar proveedor\n" +
@@ -341,7 +361,7 @@ public class App {
     }
 
     public static void crearProveedor() throws IOException {
-        System.out.println("------");
+        System.out.println("------\n");
         System.out.println("--- Crear proveedor ---");
 
         System.out.print("Código: ");
@@ -531,7 +551,7 @@ public class App {
         int opcion = -1;
         do {
             System.out.println("------");
-            System.out.print("=== Menú proyectos ===" +
+            System.out.print("=== Menú proyectos ===\n" +
                     "\t1) Crear Proyecto\n" +
                     "\t2) Editar Proyecto\n" +
                     "\t3) Borrar Proyecto\n" +
@@ -765,6 +785,144 @@ public class App {
         }
     }
 
+    public static void menuGestiones() throws IOException {
+        int opcion = -1;
+        do {
+            System.out.println("------");
+            System.out.print("=== Menú gestiones ===\n" +
+                    "\t1) Crear Gestion\n" +
+                    "\t2) Editar Gestion\n" +
+                    "\t3) Borrar Gestion\n" +
+                    "\t4) Listado de Gestiones\n" +
+                    "\t5) Busqueda por id de Gestiones\n" +
+                    "\t6) Volver\n" +
+                    "--> Opción: "
+            );
+            try {
+                opcion = Integer.parseInt(br.readLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Valor no válido");
+            } catch (IOException e) {
+                System.out.println("Error");
+            }
+
+            switch (opcion) {
+                case 1:
+                    crearGestion();
+                    break;
+                case 2:
+                    editarProyecto();
+                    break;
+                case 3:
+                    borrarProyecto();
+                    break;
+                case 4:
+                    mostrarLista(proyectos);
+                    break;
+                case 5:
+                    buscarProyectoPorNombre();
+                    break;
+                case 6:
+                    buscarProyectoPorCodigo();
+                    break;
+                case 7:
+                    buscarProyectoPorCiudad();
+                    break;
+                case 8:
+                    System.out.println("*Volviendo al menú principal");
+                default:
+                    System.out.println("Error: Introduce un numero entero del 1 al 7");
+            }
+        } while (opcion != 8);
+    }
+
+    public static void crearGestion() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Crear Gestion ---");
+
+        System.out.print("Código: ");
+        String codigo = br.readLine();
+        LocalDate fecha;
+        try {
+            System.out.print("Fecha (yyyy-mm-dd): ");
+            fecha = LocalDate.parse(br.readLine());
+        } catch (IOException e) {
+            System.out.println("Fecha no Valida");
+            return;
+        }
+        System.out.print("Cantidad: ");
+        Integer cantidad = Integer.parseInt(br.readLine());
+
+        System.out.println("Elige que proveedor formara parte de esta gestion:");
+        mostrarLista(proveedores);
+        System.out.print("--> Opción: ");
+
+        int opcion = -1;
+        try {
+            opcion = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcion < 0 || opcion >= proveedores.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        Proveedor proveedor = proveedores.get(opcion);
+
+        System.out.println("Elige que pieza formara parte de esta gestion:");
+        mostrarLista(piezas);
+        System.out.print("--> Opción: ");
+
+        int opcionPieza = -1;
+        try {
+            opcionPieza = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcionPieza < 0 || opcionPieza >= piezas.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        Pieza pieza = piezas.get(opcionPieza);
+
+        System.out.println("Elige que Proyecto formara parte de esta gestion:");
+        mostrarLista(proyectos);
+        System.out.print("--> Opción: ");
+
+        int opcionProyecto = -1;
+        try {
+            opcionProyecto = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcionProyecto < 0 || opcionProyecto >= proyectos.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        Proyecto proyecto = proyectos.get(opcionProyecto);
+
+
+        Gestion gestion = new Gestion(codigo, fecha, cantidad, proveedor, pieza, proyecto);
+        gestiones.add(gestion);
+
+        //Dao
+        ges.create(new Proyecto(codigo, nombre, ciudad));
+    }
 
     // MÉTODOS COMUNES
     // Recibe un List de objetos y los muestra

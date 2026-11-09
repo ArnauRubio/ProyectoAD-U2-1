@@ -3,6 +3,7 @@ package models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,6 +31,7 @@ public class Pieza {
     private List<Gestion> gestiones;
 
     public Pieza() {
+        gestiones = new ArrayList<Gestion>();
     }
 
     public Pieza(Integer id, String codigo, String nombre, double precio, String descripcion, List<Gestion> gestiones) {
@@ -46,6 +48,7 @@ public class Pieza {
         this.nombre = nombre;
         this.precio = precio;
         this.descripcion = descripcion;
+        gestiones = new ArrayList<>();
     }
 
     public Integer getId() {

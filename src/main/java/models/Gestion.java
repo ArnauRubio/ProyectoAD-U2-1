@@ -37,8 +37,7 @@ public class Gestion {
     public Gestion() {
     }
 
-    public Gestion(Integer id, String codigo, LocalDate fecha, Integer cantidad, Proveedor proveedor, Pieza pieza, Proyecto proyecto) {
-        this.id = id;
+    public Gestion(String codigo, LocalDate fecha, Integer cantidad, Proveedor proveedor, Pieza pieza, Proyecto proyecto) {
         this.codigo = codigo;
         this.fecha = fecha;
         this.cantidad = cantidad;
