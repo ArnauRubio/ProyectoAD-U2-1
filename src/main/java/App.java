@@ -1,6 +1,8 @@
+import dao.GestionDao;
 import dao.PiezaDao;
 import dao.ProveedorDao;
 import dao.ProyectoDao;
+import idao.IGestionDao;
 import models.Gestion;
 import models.Pieza;
 import models.Proveedor;
@@ -10,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +27,7 @@ public class App {
     static PiezaDao piezaDao = new PiezaDao();
     static ProveedorDao proveedorDao = new ProveedorDao();
     static ProyectoDao proyectoDao = new ProyectoDao();
+    static GestionDao gestionDao = new GestionDao();
 
 
     public static void main(String[] args) throws IOException {
@@ -45,7 +49,7 @@ public class App {
                 opcion = Integer.parseInt(br.readLine());
             } catch (NumberFormatException e) {
                 System.out.println("Valor no válido");
-                return;
+                continue;
             } catch (IOException e) {
                 System.out.println("Error");
             }
@@ -63,8 +67,8 @@ public class App {
                 case 4:
                     menuGestiones();
                     break;
-                    case 5:
-                        break;
+                case 5:
+                    break;
                 default:
                     System.out.println("Selecciona una opción válida");
             }
@@ -101,6 +105,7 @@ public class App {
                 opcion = Integer.parseInt(br.readLine());
             } catch (NumberFormatException e) {
                 System.out.println("Valor no válido");
+                continue;
             } catch (IOException e) {
                 System.out.println("Error");
             }
@@ -148,6 +153,7 @@ public class App {
             precio = Double.valueOf(br.readLine());
         } catch (NumberFormatException e) {
             System.out.println("Valor no válido");
+            return;
         } catch (IOException e) {
             System.out.println("Error");
         }
@@ -193,6 +199,7 @@ public class App {
             precio = Double.valueOf(br.readLine());
         } catch (NumberFormatException e) {
             System.out.println("Valor no válido");
+            return;
         } catch (IOException e) {
             System.out.println("Error");
         }
@@ -212,9 +219,6 @@ public class App {
 
         //Dao
         piezaDao.update(pieza);
-        piezaDao.update(pieza);
-        piezaDao.update(pieza);
-
     }
 
     public static void borrarPieza() {
@@ -241,14 +245,9 @@ public class App {
         }
 
         Pieza aEliminar = piezas.get(opcion);
-        // Una pieza está en varias gestiones
         for (Gestion gestion : aEliminar.getGestiones()) {
-            // Para cada una de esas gestiones
-            // Quitamos de la lista de gestiones de su proveedor
             gestion.getProveedor().getGestiones().remove(gestion);
-            // Quitamos de la lista de gestiones de su proyecto
             gestion.getProyecto().getGestiones().remove(gestion);
-            // Quitamos de la lista de gestiones de su pieza
             aEliminar.getGestiones().remove(gestion);
             gestiones.remove(gestion);
         }
@@ -325,6 +324,7 @@ public class App {
                 opcion = Integer.parseInt(br.readLine());
             } catch (NumberFormatException e) {
                 System.out.println("Valor no válido");
+                continue;
             } catch (IOException e) {
                 System.out.println("Error");
             }
@@ -566,6 +566,7 @@ public class App {
                 opcion = Integer.parseInt(br.readLine());
             } catch (NumberFormatException e) {
                 System.out.println("Valor no válido");
+                continue;
             } catch (IOException e) {
                 System.out.println("Error");
             }
@@ -614,9 +615,7 @@ public class App {
 
         Proyecto proyecto = new Proyecto(codigo, nombre, ciudad);
         proyectos.add(proyecto);
-
-        //Dao
-        proyectoDao.create(new Proyecto(codigo, nombre, ciudad));
+        proyectoDao.create(proyecto);
     }
 
     public static void editarProyecto() throws IOException {
@@ -802,6 +801,7 @@ public class App {
                 opcion = Integer.parseInt(br.readLine());
             } catch (NumberFormatException e) {
                 System.out.println("Valor no válido");
+                continue;
             } catch (IOException e) {
                 System.out.println("Error");
             }
@@ -811,29 +811,24 @@ public class App {
                     crearGestion();
                     break;
                 case 2:
-                    editarProyecto();
+                    editarGestion();
                     break;
                 case 3:
-                    borrarProyecto();
+                    borrarGestion();
                     break;
                 case 4:
-                    mostrarLista(proyectos);
+                    mostrarLista(gestiones);
                     break;
                 case 5:
-                    buscarProyectoPorNombre();
+                    buscarGestionPorCodigo();
                     break;
                 case 6:
-                    buscarProyectoPorCodigo();
-                    break;
-                case 7:
-                    buscarProyectoPorCiudad();
-                    break;
-                case 8:
                     System.out.println("*Volviendo al menú principal");
+                    break;
                 default:
-                    System.out.println("Error: Introduce un numero entero del 1 al 7");
+                    System.out.println("Error: Introduce un numero entero del 1 al 6");
             }
-        } while (opcion != 8);
+        } while (opcion != 6);
     }
 
     public static void crearGestion() throws IOException {
@@ -846,12 +841,21 @@ public class App {
         try {
             System.out.print("Fecha (yyyy-mm-dd): ");
             fecha = LocalDate.parse(br.readLine());
+        } catch (DateTimeParseException e) {
+            System.out.println("Fecha no válida. Usa el formato yyyy-MM-dd.");
+            return;
         } catch (IOException e) {
-            System.out.println("Fecha no Valida");
+            System.out.println("Error al leer la fecha.");
             return;
         }
         System.out.print("Cantidad: ");
-        Integer cantidad = Integer.parseInt(br.readLine());
+        Integer cantidad;
+        try {
+            cantidad = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("La cantidad debe ser un número entero.");
+            return;
+        }
 
         System.out.println("Elige que proveedor formara parte de esta gestion:");
         mostrarLista(proveedores);
@@ -916,12 +920,214 @@ public class App {
 
         Proyecto proyecto = proyectos.get(opcionProyecto);
 
-
+        //Dao
         Gestion gestion = new Gestion(codigo, fecha, cantidad, proveedor, pieza, proyecto);
         gestiones.add(gestion);
+        gestionDao.create(gestion);
+    }
+
+    public static void editarGestion() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Editar Gestion ---");
+
+        // Se muestra lista de gestiones y eligen una
+        mostrarLista(gestiones);
+
+        System.out.print("--> Editar: ");
+        int opcion = -1;
+        try {
+            opcion = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcion < 0 || opcion >= gestiones.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        // Nuevos valores
+        System.out.print("codigo: ");
+        String codigo = br.readLine();
+        System.out.print("fecha: ");
+        LocalDate fecha;
+        try {
+            System.out.print("Fecha (yyyy-mm-dd): ");
+            fecha = LocalDate.parse(br.readLine());
+        } catch (DateTimeParseException e) {
+            System.out.println("Fecha no válida. Usa el formato yyyy-MM-dd.");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error al leer la fecha.");
+            return;
+        }
+        System.out.print("cantidad: ");
+        int cantidad;
+        try {
+            cantidad = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("La cantidad debe ser un número entero.");
+            return;
+        }
+        System.out.print("proveedor: ");
+        System.out.println("Elige que proveedor formara parte de esta gestion:");
+        mostrarLista(proveedores);
+        System.out.print("--> Opción: ");
+
+        opcion = -1;
+        try {
+            opcion = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcion < 0 || opcion >= proveedores.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        Proveedor proveedor = proveedores.get(opcion);
+
+
+        System.out.print("pieza: ");
+        System.out.println("Elige que pieza formara parte de esta gestion:");
+        mostrarLista(piezas);
+        System.out.print("--> Opción: ");
+
+        int opcionPieza = -1;
+        try {
+            opcionPieza = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcionPieza < 0 || opcionPieza >= piezas.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        Pieza pieza = piezas.get(opcionPieza);
+
+
+        System.out.print("proyecto: ");
+        System.out.println("Elige que Proyecto formara parte de esta gestion:");
+        mostrarLista(proyectos);
+        System.out.print("--> Opción: ");
+
+        int opcionProyecto = -1;
+        try {
+            opcionProyecto = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcionProyecto < 0 || opcionProyecto >= proyectos.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        Proyecto proyecto = proyectos.get(opcionProyecto);
+
+        // Sobreescribir
+        Gestion gestion = gestiones.get(opcion);
+
+        gestion.setCodigo(codigo);
+        gestion.setFecha(fecha);
+        gestion.setCantidad(cantidad);
+
+        gestion.setProveedor(proveedor);
+        gestion.setPieza(pieza);
+        gestion.setProyecto(proyecto);
 
         //Dao
-        ges.create(new Proyecto(codigo, nombre, ciudad));
+        Gestion gestionEditado = gestionDao.buscarPorCodigo(gestion.getCodigo());
+        if (gestionEditado == null) {
+            System.out.println("No existe esa gestion.");
+        } else {
+            gestionEditado.setCodigo(codigo);
+            gestionDao.update(gestionEditado);
+            gestionEditado.setFecha(fecha);
+            gestionDao.update(gestionEditado);
+            gestionEditado.setCantidad(cantidad);
+            gestionDao.update(gestionEditado);
+            gestionEditado.setProveedor(proveedor);
+            gestionDao.update(gestionEditado);
+            gestionEditado.setPieza(pieza);
+            gestionDao.update(gestionEditado);
+            gestionEditado.setProyecto(proyecto);
+            gestionDao.update(gestionEditado);
+
+        }
+    }
+
+    public static void borrarGestion() {
+        System.out.println("------");
+        System.out.println("--- Eliminar Gestion ---");
+
+        // Se muestra lista de gestiones y eligen una
+        mostrarLista(gestiones);
+        System.out.print("--> Opción: ");
+
+        int opcion = -1;
+        try {
+            opcion = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Valor no válido");
+            return;
+        } catch (IOException e) {
+            System.out.println("Error");
+        }
+
+        if (opcion < 0 || opcion >= gestiones.size()) {
+            System.out.println("Índice no válido");
+            return;
+        }
+
+        Gestion aEliminar = gestiones.get(opcion);
+        if(aEliminar.getProveedor() == null && aEliminar.getPieza() == null && aEliminar.getProyecto() == null) {
+            gestiones.remove(opcion);
+            gestionDao.delete(aEliminar);
+        } else {
+            System.out.println("La gestion no se puede eliminar, vaciala antes de continuar");
+        }
+    }
+
+    public static void buscarGestionPorCodigo() throws IOException {
+        System.out.println("------");
+        System.out.println("--- Buscar gestion por código ---");
+
+        System.out.print("Código: ");
+        String cod = br.readLine();
+
+        boolean encontrada = false;
+        for (Gestion gestion : gestiones) {
+            if (gestion.getCodigo().equalsIgnoreCase(cod)) {
+                System.out.println("- Gestion encontrada -");
+                System.out.println("--> Código: " + gestion.getCodigo());
+                System.out.println("--> Fecha: " + gestion.getFecha());
+                System.out.println("--> Cantidad: " + gestion.getCantidad());
+                System.out.println("--> Proveedor: " + gestion.getProveedor().getNombre());
+                System.out.println("--> Pieza: " + gestion.getPieza().getNombre());
+                System.out.println("--> Proyecto: " + gestion.getProyecto().getNombre());
+
+                encontrada = true;
+            }
+        }
+        if (!encontrada) {
+            System.out.println("No se ha podido encontrar la gestion");
+        }
     }
 
     // MÉTODOS COMUNES
