@@ -86,11 +86,7 @@ public abstract class Dao<T, K> implements IDao<T, K> {
             if (existente == null) {
                 throw new IllegalStateException("El registro que se quiere eliminar no existe.");
             }
-            long n = contarSuministros(id);
-            if (n > 0) {
-                throw new IllegalStateException(
-                        "No se puede eliminar: tiene " + n + " suministro(s) asociado(s).");
-            }
+
             em.remove(existente);
             return null;
         });

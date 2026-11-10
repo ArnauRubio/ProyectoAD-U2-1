@@ -11,7 +11,7 @@ public class Proyecto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = true)
+    @Column(name = "id", nullable = false)
     private Integer id;
 
     @NotNull

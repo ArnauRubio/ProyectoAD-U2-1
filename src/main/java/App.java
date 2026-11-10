@@ -245,16 +245,24 @@ public class App {
         }
 
         Pieza aEliminar = piezas.get(opcion);
-        for (Gestion gestion : aEliminar.getGestiones()) {
-            gestion.getProveedor().getGestiones().remove(gestion);
-            gestion.getProyecto().getGestiones().remove(gestion);
-            aEliminar.getGestiones().remove(gestion);
-            gestiones.remove(gestion);
+//        for (Gestion gestion : aEliminar.getGestiones()) {
+//            if(gestion.getProveedor() != null){
+//                gestion.getProveedor().getGestiones().remove(gestion);
+//            }
+//            if(gestion.getProyecto() != null){
+//                gestion.getProyecto().getGestiones().remove(gestion);
+//            }
+//            aEliminar.getGestiones().remove(gestion);
+//            gestiones.remove(gestion);
+//        }
+        if(aEliminar.getGestiones().size() == 0){
+            piezas.remove(aEliminar);
+            //Dao
+            piezaDao.delete(aEliminar);
+            System.out.println("Pieza eliminada");
+        } else {
+            System.out.println("No se ha podido eliminar porque hay gestiones asociadas");
         }
-        piezas.remove(aEliminar);
-
-        //Dao
-        piezaDao.delete(aEliminar);   // lanza excepción si tiene suministros
     }
 
     public static void buscarPiezaPorNombre() throws IOException {
@@ -457,22 +465,24 @@ public class App {
 
         Proveedor aEliminar = proveedores.get(opcion);
         // Un proveedor está en varias gestiones
-        for (Gestion gestion : aEliminar.getGestiones()) {
-            // Para cada una de esas gestiones
-            // Quitamos de la lista de gestiones de su pieza
-            gestion.getPieza().getGestiones().remove(gestion);
-            // Quitamos de la lista de gestiones de su proyecto
-            gestion.getProyecto().getGestiones().remove(gestion);
-            // Quitamos de la lista de gestiones de su proveedor
-            aEliminar.getGestiones().remove(gestion);
-            gestiones.remove(gestion);
+//        for (Gestion gestion : aEliminar.getGestiones()) {
+//            // Para cada una de esas gestiones
+//            // Quitamos de la lista de gestiones de su pieza
+//            gestion.getPieza().getGestiones().remove(gestion);
+//            // Quitamos de la lista de gestiones de su proyecto
+//            gestion.getProyecto().getGestiones().remove(gestion);
+//            // Quitamos de la lista de gestiones de su proveedor
+//            aEliminar.getGestiones().remove(gestion);
+//            gestiones.remove(gestion);
+//        }
+        if(aEliminar.getGestiones().size() == 0){
+            proveedores.remove(aEliminar);
+            //Dao
+            proveedorDao.delete(aEliminar);
+            System.out.println("Proveedor eliminado");
+        } else {
+            System.out.println("No se ha podido eliminar porque hay gestiones asociadas");
         }
-        proveedores.remove(aEliminar);
-
-        //Dao
-        Proveedor proveedorEliminado = proveedorDao.buscarPorCodigo(aEliminar.getCodigo());
-        if (proveedorEliminado != null)
-            proveedorDao.delete(proveedorEliminado);   // lanza excepción si tiene suministros
     }
 
     public static void buscarProveedorPorNombre() throws IOException {
@@ -692,22 +702,26 @@ public class App {
         }
 
         Proyecto aEliminar = proyectos.get(opcion);
+        System.out.println(aEliminar);
         // Un proveedor está en varias gestiones
-        for (Gestion gestion : aEliminar.getGestiones()) {
-            // Para cada una de esas gestiones
-            // Quitamos de la lista de gestiones de su pieza
-            gestion.getPieza().getGestiones().remove(gestion);
-            // Quitamos de la lista de gestiones de su proveedor
-            gestion.getProveedor().getGestiones().remove(gestion);
-            // Quitamos de la lista de gestiones de su proyecto
-            aEliminar.getGestiones().remove(gestion);
-            gestiones.remove(gestion);
+//        for (Gestion gestion : aEliminar.getGestiones()) {
+//            // Para cada una de esas gestiones
+//            // Quitamos de la lista de gestiones de su pieza
+//            gestion.getPieza().getGestiones().remove(gestion);
+//            // Quitamos de la lista de gestiones de su proveedor
+//            gestion.getProveedor().getGestiones().remove(gestion);
+//            // Quitamos de la lista de gestiones de su proyecto
+//            aEliminar.getGestiones().remove(gestion);
+//            gestiones.remove(gestion);
+//        }
+        if(aEliminar.getGestiones().size() == 0){
+            proyectos.remove(aEliminar);
+            //Dao
+            proyectoDao.delete(aEliminar);
+            System.out.println("Proyecto eliminada");
+        } else {
+            System.out.println("No se ha podido eliminar porque hay gestiones asociadas");
         }
-        proyectos.remove(aEliminar);
-
-        //Dao
-        Proyecto proyectoEliminado = proyectoDao.buscarPorCodigo(aEliminar.getCodigo());
-        if (proyectoEliminado != null) proyectoDao.delete(proyectoEliminado);   // lanza excepción si tiene suministros
     }
 
     public static void buscarProyectoPorNombre() throws IOException {
@@ -922,8 +936,12 @@ public class App {
 
         //Dao
         Gestion gestion = new Gestion(codigo, fecha, cantidad, proveedor, pieza, proyecto);
+        proveedor.getGestiones().add(gestion);
+        pieza.getGestiones().add(gestion);
+        proyecto.getGestiones().add(gestion);
         gestiones.add(gestion);
         gestionDao.create(gestion);
+
     }
 
     public static void editarGestion() throws IOException {
@@ -1072,7 +1090,7 @@ public class App {
         }
     }
 
-    public static void borrarGestion() {
+    public static void borrarGestion() throws IOException {
         System.out.println("------");
         System.out.println("--- Eliminar Gestion ---");
 
@@ -1096,9 +1114,21 @@ public class App {
         }
 
         Gestion aEliminar = gestiones.get(opcion);
-        if(aEliminar.getProveedor() == null && aEliminar.getPieza() == null && aEliminar.getProyecto() == null) {
-            gestiones.remove(opcion);
-            gestionDao.delete(aEliminar);
+        if(aEliminar.getProveedor() != null || aEliminar.getPieza() != null || aEliminar.getProyecto() != null) {
+            System.out.print("¿En esta gestion hay datos. Seguro que deseas eliminarla? (s|n): ");
+            String confirmacion = br.readLine();
+            if (confirmacion.equalsIgnoreCase("s")) {
+                aEliminar.getProyecto().getGestiones().remove(aEliminar);
+                aEliminar.getProveedor().getGestiones().remove(aEliminar);
+                aEliminar.getPieza().getGestiones().remove(aEliminar);
+                gestiones.remove(opcion);
+                gestionDao.delete(aEliminar);
+            } else if (confirmacion.equalsIgnoreCase("n")) {
+                System.out.println("Operación cancelada");
+            } else {
+                System.out.println("Opción no válida");
+            }
+
         } else {
             System.out.println("La gestion no se puede eliminar, vaciala antes de continuar");
         }
