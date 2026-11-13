@@ -14,7 +14,9 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class App {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -84,6 +86,54 @@ public class App {
 
         proyectos.clear();
         proyectos.addAll(proyectoDao.findAll());
+
+        gestiones.clear();
+        gestiones.addAll(gestionDao.findAll());
+        enlazarGestionesCargadas();
+    }
+
+    private static void enlazarGestionesCargadas() {
+        Map<Integer, Proveedor> proveedoresPorId = new HashMap<>();
+        for (Proveedor proveedor : proveedores) {
+            proveedor.setGestiones(new ArrayList<>());
+            proveedoresPorId.put(proveedor.getId(), proveedor);
+        }
+
+        Map<Integer, Pieza> piezasPorId = new HashMap<>();
+        for (Pieza pieza : piezas) {
+            pieza.setGestiones(new ArrayList<>());
+            piezasPorId.put(pieza.getId(), pieza);
+        }
+
+        Map<Integer, Proyecto> proyectosPorId = new HashMap<>();
+        for (Proyecto proyecto : proyectos) {
+            proyecto.setGestiones(new ArrayList<>());
+            proyectosPorId.put(proyecto.getId(), proyecto);
+        }
+
+        for (Gestion gestion : gestiones) {
+            if (gestion.getProveedor() != null) {
+                Proveedor proveedor = proveedoresPorId.get(gestion.getProveedor().getId());
+                if (proveedor != null) {
+                    gestion.setProveedor(proveedor);
+                    proveedor.getGestiones().add(gestion);
+                }
+            }
+            if (gestion.getPieza() != null) {
+                Pieza pieza = piezasPorId.get(gestion.getPieza().getId());
+                if (pieza != null) {
+                    gestion.setPieza(pieza);
+                    pieza.getGestiones().add(gestion);
+                }
+            }
+            if (gestion.getProyecto() != null) {
+                Proyecto proyecto = proyectosPorId.get(gestion.getProyecto().getId());
+                if (proyecto != null) {
+                    gestion.setProyecto(proyecto);
+                    proyecto.getGestiones().add(gestion);
+                }
+            }
+        }
     }
 
     // PIEZAS
@@ -255,11 +305,10 @@ public class App {
 //            aEliminar.getGestiones().remove(gestion);
 //            gestiones.remove(gestion);
 //        }
-        if(aEliminar.getGestiones().size() == 0){
-            piezas.remove(aEliminar);
-            //Dao
-            piezaDao.delete(aEliminar);
-            System.out.println("Pieza eliminada");
+if (!piezaDao.tieneSuministrosAsociados(aEliminar)) {
+    piezaDao.delete(aEliminar);
+    piezas.remove(aEliminar);
+    System.out.println("Pieza eliminada");
         } else {
             System.out.println("No se ha podido eliminar porque hay gestiones asociadas");
         }
@@ -475,11 +524,10 @@ public class App {
 //            aEliminar.getGestiones().remove(gestion);
 //            gestiones.remove(gestion);
 //        }
-        if(aEliminar.getGestiones().size() == 0){
-            proveedores.remove(aEliminar);
-            //Dao
-            proveedorDao.delete(aEliminar);
-            System.out.println("Proveedor eliminado");
+if (!proveedorDao.tieneSuministrosAsociados(aEliminar)) {
+    proveedorDao.delete(aEliminar);
+    proveedores.remove(aEliminar);
+    System.out.println("Proveedor eliminado");
         } else {
             System.out.println("No se ha podido eliminar porque hay gestiones asociadas");
         }
@@ -714,11 +762,10 @@ public class App {
 //            aEliminar.getGestiones().remove(gestion);
 //            gestiones.remove(gestion);
 //        }
-        if(aEliminar.getGestiones().size() == 0){
-            proyectos.remove(aEliminar);
-            //Dao
-            proyectoDao.delete(aEliminar);
-            System.out.println("Proyecto eliminada");
+if (!proyectoDao.tieneSuministrosAsociados(aEliminar)) {
+    proyectoDao.delete(aEliminar);
+    proyectos.remove(aEliminar);
+    System.out.println("Proyecto eliminada");
         } else {
             System.out.println("No se ha podido eliminar porque hay gestiones asociadas");
         }
@@ -939,6 +986,11 @@ public class App {
         proveedor.getGestiones().add(gestion);
         pieza.getGestiones().add(gestion);
         proyecto.getGestiones().add(gestion);
+
+        gestion.setProveedor(proveedor);
+        gestion.setPieza(pieza);
+        gestion.setProyecto(proyecto);
+
         gestiones.add(gestion);
         gestionDao.create(gestion);
 
@@ -966,6 +1018,7 @@ public class App {
             System.out.println("Índice no válido");
             return;
         }
+        int indiceGestion = opcion;
 
         // Nuevos valores
         System.out.print("codigo: ");
@@ -1059,34 +1112,36 @@ public class App {
         Proyecto proyecto = proyectos.get(opcionProyecto);
 
         // Sobreescribir
-        Gestion gestion = gestiones.get(opcion);
+        Gestion gestion = gestiones.get(indiceGestion);
+        Proveedor proveedorAnterior = gestion.getProveedor();
+        Pieza piezaAnterior = gestion.getPieza();
+        Proyecto proyectoAnterior = gestion.getProyecto();
 
         gestion.setCodigo(codigo);
         gestion.setFecha(fecha);
         gestion.setCantidad(cantidad);
-
         gestion.setProveedor(proveedor);
         gestion.setPieza(pieza);
         gestion.setProyecto(proyecto);
 
-        //Dao
-        Gestion gestionEditado = gestionDao.buscarPorCodigo(gestion.getCodigo());
-        if (gestionEditado == null) {
-            System.out.println("No existe esa gestion.");
-        } else {
-            gestionEditado.setCodigo(codigo);
-            gestionDao.update(gestionEditado);
-            gestionEditado.setFecha(fecha);
-            gestionDao.update(gestionEditado);
-            gestionEditado.setCantidad(cantidad);
-            gestionDao.update(gestionEditado);
-            gestionEditado.setProveedor(proveedor);
-            gestionDao.update(gestionEditado);
-            gestionEditado.setPieza(pieza);
-            gestionDao.update(gestionEditado);
-            gestionEditado.setProyecto(proyecto);
-            gestionDao.update(gestionEditado);
-
+        gestionDao.update(gestion);
+        if (proveedorAnterior != null && !proveedorAnterior.equals(proveedor)) {
+            proveedorAnterior.getGestiones().remove(gestion);
+        }
+        if (piezaAnterior != null && !piezaAnterior.equals(pieza)) {
+            piezaAnterior.getGestiones().remove(gestion);
+        }
+        if (proyectoAnterior != null && !proyectoAnterior.equals(proyecto)) {
+            proyectoAnterior.getGestiones().remove(gestion);
+        }
+        if (!proveedor.getGestiones().contains(gestion)) {
+            proveedor.getGestiones().add(gestion);
+        }
+        if (!pieza.getGestiones().contains(gestion)) {
+            pieza.getGestiones().add(gestion);
+        }
+        if (!proyecto.getGestiones().contains(gestion)) {
+            proyecto.getGestiones().add(gestion);
         }
     }
 
@@ -1114,23 +1169,24 @@ public class App {
         }
 
         Gestion aEliminar = gestiones.get(opcion);
-        if(aEliminar.getProveedor() != null || aEliminar.getPieza() != null || aEliminar.getProyecto() != null) {
-            System.out.print("¿En esta gestion hay datos. Seguro que deseas eliminarla? (s|n): ");
-            String confirmacion = br.readLine();
-            if (confirmacion.equalsIgnoreCase("s")) {
+        System.out.print("¿Seguro que deseas eliminar esta gestión? (s|n): ");
+        String confirmacion = br.readLine();
+        if (confirmacion.equalsIgnoreCase("s")) {
+            gestionDao.delete(aEliminar);
+            if (aEliminar.getProyecto() != null) {
                 aEliminar.getProyecto().getGestiones().remove(aEliminar);
-                aEliminar.getProveedor().getGestiones().remove(aEliminar);
-                aEliminar.getPieza().getGestiones().remove(aEliminar);
-                gestiones.remove(opcion);
-                gestionDao.delete(aEliminar);
-            } else if (confirmacion.equalsIgnoreCase("n")) {
-                System.out.println("Operación cancelada");
-            } else {
-                System.out.println("Opción no válida");
             }
-
+            if (aEliminar.getProveedor() != null) {
+                aEliminar.getProveedor().getGestiones().remove(aEliminar);
+            }
+            if (aEliminar.getPieza() != null) {
+                aEliminar.getPieza().getGestiones().remove(aEliminar);
+            }
+            gestiones.remove(opcion);
+        } else if (confirmacion.equalsIgnoreCase("n")) {
+            System.out.println("Operación cancelada");
         } else {
-            System.out.println("La gestion no se puede eliminar, vaciala antes de continuar");
+            System.out.println("Opción no válida");
         }
     }
 
@@ -1148,9 +1204,12 @@ public class App {
                 System.out.println("--> Código: " + gestion.getCodigo());
                 System.out.println("--> Fecha: " + gestion.getFecha());
                 System.out.println("--> Cantidad: " + gestion.getCantidad());
-                System.out.println("--> Proveedor: " + gestion.getProveedor().getNombre());
-                System.out.println("--> Pieza: " + gestion.getPieza().getNombre());
-                System.out.println("--> Proyecto: " + gestion.getProyecto().getNombre());
+                System.out.println("--> Proveedor: " + (gestion.getProveedor() == null
+                        ? "no encontrado" : gestion.getProveedor().getNombre()));
+                System.out.println("--> Pieza: " + (gestion.getPieza() == null
+                        ? "no encontrada" : gestion.getPieza().getNombre()));
+                System.out.println("--> Proyecto: " + (gestion.getProyecto() == null
+                        ? "no encontrado" : gestion.getProyecto().getNombre()));
 
                 encontrada = true;
             }
@@ -1166,7 +1225,27 @@ public class App {
         System.out.println("------");
         System.out.println("--- Mostrar lista ---");
         for (int i = 0; i < lista.size(); i++) {
-            System.out.println(i + " - " + lista.get(i));
+            Object elemento = lista.get(i);
+            System.out.println(i + " - " + elemento);
+            if (elemento instanceof Proveedor) {
+                mostrarGestionesAsociadas(((Proveedor) elemento).getGestiones());
+            } else if (elemento instanceof Pieza) {
+                mostrarGestionesAsociadas(((Pieza) elemento).getGestiones());
+            } else if (elemento instanceof Proyecto) {
+                mostrarGestionesAsociadas(((Proyecto) elemento).getGestiones());
+            }
+        }
+    }
+
+    private static void mostrarGestionesAsociadas(List<Gestion> gestionesAsociadas) {
+        if (gestionesAsociadas.isEmpty()) {
+            System.out.println("   Gestiones asociadas: ninguna");
+            return;
+        }
+        System.out.println("   Gestiones asociadas:");
+        for (Gestion gestion : gestionesAsociadas) {
+            System.out.println("      " + gestion.getCodigo() + " (" + gestion.getFecha()
+                    + "), cantidad: " + gestion.getCantidad());
         }
     }
 }

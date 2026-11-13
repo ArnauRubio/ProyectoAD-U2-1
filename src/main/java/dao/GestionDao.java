@@ -14,7 +14,7 @@ public class GestionDao extends Dao<Gestion, Integer> implements IGestionDao {
     // JOIN FETCH carga proveedor, pieza y proyecto en la misma consulta
     private static final String LISTAR_CON_DETALLE =
             "SELECT g FROM Gestion g "
-                    + "JOIN FETCH g.proveedor JOIN FETCH g.pieza JOIN FETCH g.proyecto "
+                    + "LEFT JOIN FETCH g.proveedor LEFT JOIN FETCH g.pieza LEFT JOIN FETCH g.proyecto "
                     + "ORDER BY g.fecha DESC";
     private static final String POR_FECHA =
             "FROM Gestion g WHERE g.fecha BETWEEN :desde AND :hasta ORDER BY g.fecha DESC";
